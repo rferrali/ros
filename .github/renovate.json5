@@ -8,6 +8,13 @@
 
   "packageRules": [
     {
+      // The base image tracks :stable through daily rebuilds; a digest pin
+      // would freeze it unless every Renovate PR got merged.
+      "matchFileNames": ["Containerfile"],
+      "matchDatasources": ["docker"],
+      "pinDigests": false,
+    },
+    {
       "automerge": true,
       "matchUpdateTypes": ["pin", "pinDigest"]
     },
