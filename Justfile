@@ -177,6 +177,15 @@ ostree-rechunk $target_image=image_name $tag=default_tag:
 
     GRAPHROOT="$(podman info --format '{{ '{{.Store.GraphRoot}}' }}')"
 
+    # Reuse the published image's layer plan. Without it the package-to-layer
+    # packing is recomputed each build, and a single package changing size
+    # reshuffles dozens of layers that clients then re-download.
+    CHUNK_ARGS=()
+    PREVIOUS="docker://ghcr.io/{{ repo_organization }}/${target_image}:${tag}"
+    if skopeo inspect --raw "${PREVIOUS}" >/dev/null 2>&1; then
+        CHUNK_ARGS+=(--previous-build "${PREVIOUS}")
+    fi
+
     podman run --rm --pull=never --privileged \
       --mount=type=image,src="${target_image}:${tag}",target=/rpm-ostree \
       --mount=type=bind,src=${GRAPHROOT},target=/run/host-container-storage,rw \
@@ -188,6 +197,7 @@ ostree-rechunk $target_image=image_name $tag=default_tag:
       --format-version=2 \
       --bootc \
       --rootfs /rpm-ostree \
+      "${CHUNK_ARGS[@]}" \
       --output "containers-storage:[overlay@/run/host-container-storage+/run/rpm-ostree-storage]localhost/${target_image}:${tag}"
 
 # Generate Default Tag

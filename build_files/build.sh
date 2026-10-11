@@ -79,6 +79,14 @@ rmdir /var/opt
 
 /ctx/claude-desktop.sh
 
+### Neither tree is owned by an RPM (the deb is unpacked; Chrome moved out of
+### the /opt path its RPM records), so rpm-ostree's chunker would lump both
+### into one ~1 GB "unpackaged content" layer shared with the initramfs. Give
+### each its own layer so an update only re-downloads the app that changed.
+
+setfattr -n user.component -v google-chrome /usr/lib/opt/google
+setfattr -n user.component -v claude-desktop /usr/lib/claude-desktop
+
 update-mime-database /usr/share/mime
 update-desktop-database -q /usr/share/applications
 gtk-update-icon-cache -qf /usr/share/icons/hicolor
