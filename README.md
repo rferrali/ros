@@ -7,7 +7,7 @@ my machine, built daily by CI from [ublue-os/image-template](https://github.com/
 |---|---|---|
 | Google Chrome | Google's rpm repo, latest | Moved to `/usr/lib/opt/google`; tmpfiles links `/opt/google` to it so PWA launchers keep working |
 | Claude Desktop | Anthropic's apt repo, latest | Only shipped as a .deb; unpacked by `build_files/claude-desktop.sh` |
-| GlobalProtect-openconnect | GitHub release RPM, pinned | Unsigned upstream, so version + SHA256 are pinned in `build.sh` |
+| GlobalProtect-openconnect | GitHub release RPM, latest | Not the COPR, which can't ship `gpgui` on image-based systems ([#467](https://github.com/yuezk/GlobalProtect-openconnect/issues/467)). Unsigned upstream; checked against GitHub's SHA256 digest for the asset |
 | Dropbox (Nautilus extension + CLI) | Dropbox's rpm repo, latest | Plus `python3-gpg` so the CLI can verify the daemon it downloads |
 
 Third-party repos are only enabled during the build, with signing keys pinned in
@@ -16,8 +16,12 @@ libraries on the current base.
 
 ## Updating
 
-- Chrome, Claude Desktop, Dropbox and the Bluefin base: automatic, via the daily build.
-- GlobalProtect: bump `GP_VERSION` and `GP_SHA256` in `build_files/build.sh`.
+Everything (Bluefin base, Chrome, Claude Desktop, Dropbox, GlobalProtect)
+updates with the daily build. To hold GlobalProtect at a release, set
+`GP_VERSION` in `build_files/build.sh` to its tag (e.g. `v3.0.2`).
+
+`just build` passes `$GITHUB_TOKEN` (when set) to the build as a secret for
+the GitHub API lookup; CI does this automatically.
 
 ## Build locally
 

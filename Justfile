@@ -99,6 +99,10 @@ build $target_image=image_name $tag=default_tag:
     set -euox pipefail
 
     BUILD_ARGS=()
+    # Lets build.sh query the GitHub API without hitting anonymous rate limits.
+    if [[ -n "${GITHUB_TOKEN:-}" ]]; then
+        BUILD_ARGS+=("--secret" "id=GITHUB_TOKEN,env=GITHUB_TOKEN")
+    fi
     LABELS=()
     if [[ -z "$(git status -s)" ]]; then
         GIT_SHA=$(git rev-parse --short HEAD)

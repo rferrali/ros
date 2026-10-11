@@ -25,14 +25,29 @@ gpgcheck=1
 gpgkey=file:///ctx/keys/dropbox.asc
 EOF
 
-### GlobalProtect-openconnect: upstream's release RPM is unsigned, so pin its hash.
+### GlobalProtect-openconnect from its GitHub release. Not the COPR: that build
+### omits gpgui and expects to download it into /usr at runtime, which can't
+### work on an image-based system (yuezk/GlobalProtect-openconnect#467).
+### The RPM is unsigned; it's checked against the SHA256 digest GitHub records
+### for the release asset.
 
-GP_VERSION=2.6.5
-GP_SHA256=e1e72666df83d5715de3230f0ccc867f132187ac420473c34ceadb75bee195bc
-GP_RPM=/tmp/globalprotect-openconnect-${GP_VERSION}-1.x86_64.rpm
-curl -fsSL -o "$GP_RPM" \
-  "https://github.com/yuezk/GlobalProtect-openconnect/releases/download/v${GP_VERSION}/${GP_RPM##*/}"
-echo "${GP_SHA256}  ${GP_RPM}" | sha256sum -c -
+GP_VERSION=latest  # or a tag such as v3.0.2 to pin
+GP_API=https://api.github.com/repos/yuezk/GlobalProtect-openconnect/releases
+[[ $GP_VERSION == latest ]] && GP_RELEASE=$GP_API/latest || GP_RELEASE=$GP_API/tags/$GP_VERSION
+GP_AUTH=()
+# CI passes its token as a build secret; GitHub's anonymous API limit is per IP
+# and shared runner IPs exhaust it.
+if [[ -s /run/secrets/GITHUB_TOKEN ]]; then
+  GP_AUTH=(-H "Authorization: Bearer $(< /run/secrets/GITHUB_TOKEN)")
+fi
+read -r GP_URL GP_DIGEST < <(
+  curl -fsSL "${GP_AUTH[@]}" "$GP_RELEASE" | jq -er '
+    .assets[] | select(.name | test("^globalprotect-openconnect-.*\\.x86_64\\.rpm$"))
+    | "\(.browser_download_url) \(.digest | ltrimstr("sha256:"))"'
+)
+GP_RPM=/tmp/${GP_URL##*/}
+curl -fsSL -o "$GP_RPM" "$GP_URL"
+echo "${GP_DIGEST}  ${GP_RPM}" | sha256sum -c -
 
 ### Packages
 
@@ -83,7 +98,7 @@ missing=$(
 [[ -z $missing ]] || { echo "Unresolved libraries:"; echo "$missing"; exit 1; }
 python3 -c 'import gpg'
 
-### Scriptlet leftovers bootc lint flags (GConf2 writes /var/lib/rpm-state).
+### Leftovers bootc lint flags: GConf2 scriptlet state, dnf countme markers.
 
 dnf5 clean all
-rm -rf /run/dnf /var/lib/rpm-state
+rm -rf /run/dnf /var/lib/rpm-state /var/lib/dnf/repos
