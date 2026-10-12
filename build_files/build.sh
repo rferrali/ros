@@ -33,16 +33,21 @@ EOF
 
 GP_VERSION=latest  # or a tag such as v3.0.2 to pin
 GP_API=https://api.github.com/repos/yuezk/GlobalProtect-openconnect/releases
-[[ $GP_VERSION == latest ]] && GP_RELEASE=$GP_API/latest || GP_RELEASE=$GP_API/tags/$GP_VERSION
 GP_AUTH=()
 # CI passes its token as a build secret; GitHub's anonymous API limit is per IP
 # and shared runner IPs exhaust it.
 if [[ -s /run/secrets/GITHUB_TOKEN ]]; then
   GP_AUTH=(-H "Authorization: Bearer $(< /run/secrets/GITHUB_TOKEN)")
 fi
+# "latest" means the newest stable release whose RPM is already uploaded:
+# assets appear over several minutes after a release is published.
 read -r GP_URL GP_DIGEST < <(
-  curl -fsSL "${GP_AUTH[@]}" "$GP_RELEASE" | jq -er '
-    .assets[] | select(.name | test("^globalprotect-openconnect-.*\\.x86_64\\.rpm$"))
+  curl -fsSL "${GP_AUTH[@]}" "$GP_API?per_page=10" | jq -er --arg tag "$GP_VERSION" '
+    [ .[] | select(.draft | not) | select(.prerelease | not)
+      | select($tag == "latest" or .tag_name == $tag)
+      | .assets[] | select(.name | test("^globalprotect-openconnect-.*\\.x86_64\\.rpm$"))
+      | select(.digest != null) ]
+    | first // error("no release \($tag) with an x86_64 RPM")
     | "\(.browser_download_url) \(.digest | ltrimstr("sha256:"))"'
 )
 GP_RPM=/tmp/${GP_URL##*/}
