@@ -62,6 +62,7 @@ dnf5 install -y \
   google-chrome-stable \
   nautilus-dropbox \
   python3-gpg \
+  zsh \
   "$GP_RPM"
 
 rm -f /etc/yum.repos.d/ros-*.repo
