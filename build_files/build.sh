@@ -86,6 +86,10 @@ rmdir /var/opt
 
 setfattr -n user.component -v google-chrome /usr/lib/opt/google
 setfattr -n user.component -v claude-desktop /usr/lib/claude-desktop
+# GConf2's scriptlet (a nautilus-dropbox dependency) regenerates this tree with
+# different bytes on every build; alone, it would force a re-download of the
+# whole unpackaged-content layer (initramfs, Homebrew tarball, ~570 MB).
+setfattr -n user.component -v gconf /etc/gconf
 
 update-mime-database /usr/share/mime
 update-desktop-database -q /usr/share/applications
