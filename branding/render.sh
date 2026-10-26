@@ -14,9 +14,14 @@ render() {
     -define png:exclude-chunk=date,time "$2"
 }
 
-# Plymouth draws images at logical size and doubles them on HiDPI screens;
-# 43 px matches the height of the Bluefin watermark it replaces.
+# Plymouth draws the watermark 1:1 in physical pixels; 43 px matches the
+# height of the Bluefin watermark it replaces.
 render 43 system_files/usr/share/plymouth/themes/spinner/watermark.png
 
-# GDM scales its logo to 48 logical px tall; 192 px stays sharp up to 4x.
-render 192 system_files/usr/share/pixmaps/ros-gdm-logo.png
+# GDM always scales its logo to fill a 48 logical px tall slot (96 physical
+# px at 2x). To match Plymouth's 43 physical px, pad the wordmark into a
+# transparent canvas: 86 px tall inside 192 px, i.e. 43 inside 96 at 2x.
+gdm=system_files/usr/share/pixmaps/ros-gdm-logo.png
+render 86 "$gdm"
+magick "$gdm" -background none -gravity center -extent "x192" -strip \
+  -define png:exclude-chunk=date,time "$gdm"

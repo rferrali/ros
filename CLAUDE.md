@@ -42,8 +42,9 @@ is installed; it never sets anyone's shell.
     download, then it's stable. Baseline no-change update is ~120 MB.
 - Branding: `branding/logo.png` is the source; `branding/render.sh` renders
   the Plymouth watermark and GDM logo into `system_files/` (committed, so the
-  bytes never change between builds). GDM's logo is set by
-  `zz1-ros.gschema.override`. Plymouth runs from the initramfs, so `build.sh`
+  bytes never change between builds). Plymouth draws the watermark 1:1; GDM
+  always fills a 48 logical px slot, so its logo is padded to look the same
+  size. GDM's logo is set by `zz1-ros.gschema.override`. Plymouth runs from the initramfs, so `build.sh`
   rebuilds it with Bluefin's dracut flags (reproducible: identical bytes for
   identical inputs, so no daily churn). rpm-ostree ignores `user.component`
   on the initramfs; it stays packed with the unpackaged-content layer.
