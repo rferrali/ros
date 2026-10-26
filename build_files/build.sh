@@ -113,9 +113,9 @@ KVER=$(ls /usr/lib/modules)
 INITRAMFS=/usr/lib/modules/$KVER/initramfs.img
 DRACUT_NO_XATTR=1 dracut --no-hostonly --kver "$KVER" --reproducible --add ostree -f "$INITRAMFS"
 chmod 0600 "$INITRAMFS"
-# Own layer: otherwise a changed initramfs re-ships the whole ~570 MB
-# unpackaged-content layer it shares with the Homebrew tarball and others.
-setfattr -n user.component -v initramfs "$INITRAMFS"
+# No user.component here: rpm-ostree names the initramfs itself and ignores
+# the xattr. It shares a layer with the unpackaged content; that's fine because
+# --reproducible gives identical bytes until the kernel or base changes.
 
 ### Smoke test: fail the build if anything doesn't link on this base.
 

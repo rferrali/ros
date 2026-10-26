@@ -45,7 +45,8 @@ is installed; it never sets anyone's shell.
   bytes never change between builds). GDM's logo is set by
   `zz1-ros.gschema.override`. Plymouth runs from the initramfs, so `build.sh`
   rebuilds it with Bluefin's dracut flags (reproducible: identical bytes for
-  identical inputs) and tags it `user.component=initramfs`.
+  identical inputs, so no daily churn). rpm-ostree ignores `user.component`
+  on the initramfs; it stays packed with the unpackaged-content layer.
 - Builds run `bootc container lint`; clean up scriptlet leftovers in `/var` and
   `/run` (see end of `build.sh`).
 - CI cancels an in-progress build when a new push arrives (concurrency group).
