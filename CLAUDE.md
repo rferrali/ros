@@ -40,6 +40,12 @@ is installed; it never sets anyone's shell.
     in `build.sh` (Chrome, Claude Desktop, `/etc/gconf`).
   - Adding a component repacks the image once (127-layer cap): one large client
     download, then it's stable. Baseline no-change update is ~120 MB.
+- Branding: `branding/logo.png` is the source; `branding/render.sh` renders
+  the Plymouth watermark and GDM logo into `system_files/` (committed, so the
+  bytes never change between builds). GDM's logo is set by
+  `zz1-ros.gschema.override`. Plymouth runs from the initramfs, so `build.sh`
+  rebuilds it with Bluefin's dracut flags (reproducible: identical bytes for
+  identical inputs) and tags it `user.component=initramfs`.
 - Builds run `bootc container lint`; clean up scriptlet leftovers in `/var` and
   `/run` (see end of `build.sh`).
 - CI cancels an in-progress build when a new push arrives (concurrency group).

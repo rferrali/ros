@@ -10,6 +10,9 @@ my machine, built daily by CI from [ublue-os/image-template](https://github.com/
 | GlobalProtect-openconnect | GitHub release RPM, latest | Not the COPR, which can't ship `gpgui` on image-based systems ([#467](https://github.com/yuezk/GlobalProtect-openconnect/issues/467)). Unsigned upstream; checked against GitHub's SHA256 digest for the asset |
 | Dropbox (Nautilus extension + CLI) | Dropbox's rpm repo, latest | Plus `python3-gpg` so the CLI can verify the daemon it downloads |
 
+Boot splash (Plymouth) and login screen (GDM) show `branding/logo.png`;
+after changing it, run `branding/render.sh` and commit the rendered files.
+
 Third-party repos are only enabled during the build, with signing keys pinned in
 `build_files/keys/`. The build fails if any of the binaries above has unresolved
 libraries on the current base.

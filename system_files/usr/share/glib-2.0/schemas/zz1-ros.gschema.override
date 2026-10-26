@@ -1,0 +1,4 @@
+# Overrides are applied in lexical order; zz1- sorts after Fedora's
+# org.gnome.login-screen.gschema.override, which points at its own logo.
+[org.gnome.login-screen]
+logo='/usr/share/pixmaps/ros-gdm-logo.png'

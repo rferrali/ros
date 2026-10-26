@@ -101,6 +101,22 @@ update-mime-database /usr/share/mime
 update-desktop-database -q /usr/share/applications
 gtk-update-icon-cache -qf /usr/share/icons/hicolor
 
+### Branding (assets rendered by branding/render.sh, copied in from
+### system_files): GDM's logo comes from the zz1-ros GSettings override.
+### Plymouth runs from the initramfs, which carries its own copy of the theme,
+### so the initramfs is rebuilt the way Bluefin builds it.
+
+glib-compile-schemas /usr/share/glib-2.0/schemas
+
+KVER=$(ls /usr/lib/modules)
+[[ $(wc -w <<< "$KVER") -eq 1 ]] || { echo "expected one kernel, got: $KVER"; exit 1; }
+INITRAMFS=/usr/lib/modules/$KVER/initramfs.img
+DRACUT_NO_XATTR=1 dracut --no-hostonly --kver "$KVER" --reproducible --add ostree -f "$INITRAMFS"
+chmod 0600 "$INITRAMFS"
+# Own layer: otherwise a changed initramfs re-ships the whole ~570 MB
+# unpackaged-content layer it shares with the Homebrew tarball and others.
+setfattr -n user.component -v initramfs "$INITRAMFS"
+
 ### Smoke test: fail the build if anything doesn't link on this base.
 
 missing=$(
