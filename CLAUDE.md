@@ -1,6 +1,6 @@
 # ros
 
-Personal bootc image: `ghcr.io/ublue-os/bluefin-dx:stable` plus what used to be
+Personal bootc image: `ghcr.io/ublue-os/bluefin-dx:latest` plus what used to be
 rpm-ostree layering on my machine. Built daily by GitHub Actions from
 ublue-os/image-template, published as `ghcr.io/rferrali/ros:stable`. My machine
 is rebased onto it (`ostree-unverified-registry:`).
@@ -17,7 +17,8 @@ is installed; it never sets anyone's shell.
 - Base is Fedora-based Bluefin, not Bluefin Dakota (GNOME OS, alpha, would need
   a reinstall). The `dakota` branch is a parked Dakota version, local only.
 - Base image is deliberately unpinned (no digest): the daily build tracks
-  `:stable`. Renovate is told not to pin it.
+  `:latest` (newest Fedora as soon as Bluefin ships it, not `:stable`).
+  Renovate is told not to pin it. The published tag stays `ros:stable`.
 - Third-party repos (Google, Dropbox) are enabled only during the build, with
   keys pinned in `build_files/keys/`; their repo files are disabled in the image.
 - Claude Desktop comes from Anthropic's signed apt repo (.deb, unpacked by

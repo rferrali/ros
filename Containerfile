@@ -5,8 +5,8 @@ COPY system_files /system_files
 
 # Base Image
 # Deliberately unpinned: the daily CI build (`just build` uses --pull=newer)
-# is what tracks Bluefin's :stable updates.
-FROM ghcr.io/ublue-os/bluefin-dx:stable
+# is what tracks Bluefin's :latest updates.
+FROM ghcr.io/ublue-os/bluefin-dx:latest
 
 # /opt stays a symlink to /var/opt (bluefin-dx's Docker keeps containerd state
 # there); build.sh moves Chrome's /opt payload into /usr instead.

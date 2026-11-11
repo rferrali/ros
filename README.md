@@ -1,6 +1,6 @@
 # ros
 
-`ghcr.io/ublue-os/bluefin-dx:stable` plus what used to be rpm-ostree layering on
+`ghcr.io/ublue-os/bluefin-dx:latest` plus what used to be rpm-ostree layering on
 my machine, built daily by CI from [ublue-os/image-template](https://github.com/ublue-os/image-template).
 
 | Component | Source | Notes |

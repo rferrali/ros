@@ -8,7 +8,7 @@
 
   "packageRules": [
     {
-      // The base image tracks :stable through daily rebuilds; a digest pin
+      // The base image tracks :latest through daily rebuilds; a digest pin
       // would freeze it unless every Renovate PR got merged.
       "matchFileNames": ["Containerfile"],
       "matchDatasources": ["docker"],
